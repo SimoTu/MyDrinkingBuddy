@@ -1,0 +1,129 @@
+package com.example.mydrink;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+
+import java.util.ArrayList;
+import java.util.Random;
+
+public class Main2Activity extends AppCompatActivity implements View.OnClickListener {
+
+    ArrayList<ArrayList<Integer>> listOfLists = new ArrayList<ArrayList<Integer>>();
+
+    ArrayList<Integer> deckOfCards_spades = new ArrayList<>();
+    ArrayList<Integer> deckOfCards_clubs = new ArrayList<>();
+    ArrayList<Integer> deckOfCards_hearts = new ArrayList<>();
+    ArrayList<Integer> deckOfCards_diamonds = new ArrayList<>();
+
+    Random r = new Random();
+
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_second);
+
+
+        //Adding all the usable cards from drawable folder to deckOfCards
+        for (int i=0; i<13; i++){
+            int j = i + 1;
+            deckOfCards_spades.add(i,getResources().getIdentifier("spades_"+j,"drawable",getPackageName()));
+        }
+
+
+        for (int i=0; i<13; i++){
+            int j = i + 1;
+            deckOfCards_hearts.add(i,getResources().getIdentifier("hearts_"+j,"drawable",getPackageName()));
+        }
+
+
+
+        for (int i=0; i<13; i++){
+            int j = i + 1;
+            deckOfCards_diamonds.add(i,getResources().getIdentifier("diamonds_"+j,"drawable",getPackageName()));
+        }
+
+
+
+        for (int i=0; i<13; i++){
+            int j = i + 1;
+            deckOfCards_clubs.add(i,getResources().getIdentifier("clubs_"+j,"drawable",getPackageName()));
+        }
+
+        listOfLists.add(deckOfCards_clubs);
+        listOfLists.add(deckOfCards_hearts);
+        listOfLists.add(deckOfCards_diamonds);
+        listOfLists.add(deckOfCards_clubs);
+
+
+
+        ImageView myImageView = findViewById(R.id.imageView);
+        myImageView.setOnClickListener(this);
+        //myImageView.setImageResource(R.drawable.card_back);
+
+
+    }//onCreate
+
+
+
+
+
+    @Override
+    public void onClick(View v) {
+
+        switch(v.getId()) {
+
+            case R.id.imageView:
+
+
+
+
+                    int index = r.nextInt(listOfLists.size());
+                    int index2 = r.nextInt(deckOfCards_hearts.size());
+                    Integer randomCard = listOfLists.get(index).get(index2);
+                    System.out.println(listOfLists.get(index).get(index2).toString());
+                    ImageView myImageView2 = findViewById(R.id.imageView);
+                    myImageView2.setImageResource(randomCard);
+
+
+
+                break;
+
+
+
+            case R.id.button_big:
+                checkGuess();
+                break;
+
+            case R.id.button_small:
+                checkGuess();
+                break;
+
+
+            case R.id.button_red:
+                checkGuess();
+                break;
+
+
+            case R.id.button_black:
+                checkGuess();
+                break;
+
+
+        }//switch
+    }//onClick
+
+
+public void checkGuess(){
+
+
+
+}
+
+
+
+}//Main2Activity

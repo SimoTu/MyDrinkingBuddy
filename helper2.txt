@@ -1,0 +1,282 @@
+package com.example.mydrink;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, ExampleDialog.ExampleDialogListener {
+
+
+    List<Integer> deckOfCards = new ArrayList<Integer>();
+    List<Integer> deckOfCardsCopy = new ArrayList<Integer>();
+    LinkedList deckOfRedo = new LinkedList();
+    List game_options = new ArrayList();
+    int[] deckOfArray = new int[65]; // combining both statements in one
+
+
+    int previous_counter = 0;
+    Random r = new Random();
+
+    private boolean settings1,settings2;
+    int pickedImage = 0,lastPicked = 0;
+
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState){
+
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        game_options.add("One game");
+        game_options.add("Never ending");
+        game_options.add("IPPM");
+/*
+        for (int i = 0; i<65; i++){
+            int j = i + 1;
+            deckOfCards.add(i,getResources().getIdentifier("kortti"+j,"drawable",getPackageName()));
+        }
+*/
+        for (int i = 0; i<65; i++){
+            int j = i + 1;
+            deckOfArray[i]=getResources().getIdentifier("kortti"+j,"drawable",getPackageName());
+        }
+
+        settings1 = false;//loop mode
+        settings2 = true;//deletion mode --------DEFAULT---------
+
+
+        ImageView myImageView = findViewById(R.id.imageView);
+        myImageView.setOnClickListener(this);
+
+        Button btn_redo = findViewById(R.id.button_idiot);
+        btn_redo.setOnClickListener(this);
+
+        myImageView.setImageResource(R.drawable.korttitaka);
+    }//onCreate
+
+
+
+    @Override
+    public void onYesClicked() {
+        startAgain();
+    }
+
+    @Override
+    public void onNoClicked() {
+        System.out.println("no");
+    }
+
+    public void startAgain(){
+        deckOfCards.clear();
+        deckOfRedo.clear();
+        deckOfCards.addAll(deckOfCardsCopy);
+        ImageView myImageView = findViewById(R.id.imageView);
+        myImageView.setImageResource(R.drawable.korttitaka);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_bar, menu);
+        return true;
+    }
+
+
+//-----------------Menu for selecting the game mode
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.loopgame:
+                Toast.makeText(MainActivity.this, "Selected "+ item.toString(), Toast.LENGTH_LONG).show();
+                settings2 =false;
+                settings1 =true;
+                ImageView myImageView = findViewById(R.id.imageView);
+                myImageView.setImageResource(R.drawable.korttitaka);
+                deckOfRedo.clear();
+                return true;
+            case R.id.onegame:
+                Toast.makeText(MainActivity.this, "Selected "+ item.toString(), Toast.LENGTH_LONG).show();
+                settings2 =true;
+                settings1 =false;
+                ImageView myImageView2 = findViewById(R.id.imageView);
+                myImageView2.setImageResource(R.drawable.korttitaka);
+                pickedImage=0;
+                lastPicked=0;
+                deckOfCards.clear();
+                deckOfRedo.clear();
+                deckOfCards.addAll(deckOfCardsCopy);
+                return true;
+
+            case R.id.IPPM:
+
+
+                openActivity2();
+
+
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void openActivity2() {
+        Intent intent = new Intent(this, Main2Activity.class);
+        startActivity(intent);
+
+    }
+
+
+    public void openDialog() {
+        ExampleDialog exampleDialog = new ExampleDialog();
+        exampleDialog.show(getSupportFragmentManager(), "Dialog");
+    }
+
+
+
+    @Override
+    public void onClick(View v) {
+// switch case for using onClickListener for both ImageView and back-button
+        switch(v.getId()) {
+
+            case R.id.imageView:
+                //----------Never ending mode--------
+            if (settings1) {
+                ImageView myImageView = findViewById(R.id.imageView);
+
+                //prevents duplicates from coming twice in a row
+                do {
+                    pickedImage = r.nextInt(deckOfCards.size());
+                } while (pickedImage == lastPicked);
+
+                if (deckOfCards.size() > 0) {
+
+
+                    int index = r.nextInt(deckOfCards.size());
+
+                    if(previous_counter>=1&& deckOfRedo.size()>0){
+                        int randomCard2 = (int) deckOfRedo.getFirst();
+                        myImageView.setImageResource(randomCard2);
+
+                    }else{
+                        int randomCard = deckOfCards.get(index);
+                        myImageView.setImageResource(randomCard);
+                        deckOfRedo.addFirst(randomCard);
+                        System.out.println(randomCard);
+
+                    }
+                    previous_counter=0;
+
+
+                }//deckOfCards size if
+
+            }//if settings are in NEVER ENDING
+
+
+                //----------One game mode--------
+            else if (settings2) {
+
+                ImageView myImageView = findViewById(R.id.imageView);
+
+                //prevents duplicates from coming twice in a row
+                do {
+                    pickedImage = r.nextInt(deckOfArray.length);
+                } while (pickedImage == lastPicked);
+
+                if (deckOfArray.length > 0) {
+                    int index = r.nextInt(deckOfArray.length);
+
+                    //used if player has gone back once or more times
+
+
+                    // Normal game logic.....
+                    if(previous_counter==0 && deckOfArray.length>0 && deckOfArray[index]!=0){
+                        int randomCard = deckOfArray[index];
+                        myImageView.setImageResource(randomCard);
+                        deckOfRedo.addFirst(randomCard);
+                        System.out.println(randomCard);
+                        deckOfArray[index]=0;
+                    }
+                    else if(deckOfArray[index]==0 && previous_counter==0){
+
+                        do {
+                            index = r.nextInt(deckOfArray.length);
+
+                        } while (deckOfArray[index] == 0);
+
+                        int randomCard = deckOfArray[index];
+                        myImageView.setImageResource(randomCard);
+                        deckOfRedo.addFirst(randomCard);
+                        System.out.println(randomCard);
+                        deckOfArray[index]=0;
+                    }
+                    else if(previous_counter>=1&& deckOfRedo.size()>0){
+                        int randomCard2 = (int) deckOfRedo.getFirst();
+                        myImageView.setImageResource(randomCard2);
+                    }
+                    previous_counter=0;
+
+
+                } else {
+                    myImageView.setImageResource(R.drawable.x_cat);
+                    openDialog();
+                }
+            }//----ONE GAME MODE IF
+
+            break;
+
+//--------------This is for the back button logic-----------------------
+            case R.id.button_idiot:
+
+                previous_counter++;
+
+                if(previous_counter>1){
+                ImageView myImageView = findViewById(R.id.imageView);
+                myImageView.setImageResource(R.drawable.x_cat);
+                }
+                //----------------for NEVER ENDING mode----------------------------
+               else if(settings1==true && deckOfRedo.size()>1){
+                    int randomCard = (int) deckOfRedo.get(1);
+                    ImageView myImageView = findViewById(R.id.imageView);
+                    myImageView.setImageResource(randomCard);
+                }
+
+               //----------------for ONE GAME mode----------------------------
+                else if(settings2==true && deckOfRedo.size()>1){
+                    int randomCard = (int) deckOfRedo.get(1);
+                    ImageView myImageView = findViewById(R.id.imageView);
+                    myImageView.setImageResource(randomCard);
+                }
+                //----------------fail safe----------------------------
+               else{
+                   ImageView myImageView = findViewById(R.id.imageView);
+                   myImageView.setImageResource(R.drawable.x_cat);
+               }
+
+
+               break;
+
+        }//switch
+    }//onClick
+}//MainActivity
+
+
+
+
+
+
+
+
